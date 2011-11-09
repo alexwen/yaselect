@@ -35,19 +35,22 @@ jQuery.fn.yaselect = function(options) {
       .change(function(e) { curr.text(gettext()); })
       .blur(function(e) { jselect.hide(); toggle(); })
       .click(function(e) {
-        if (jselect.is(':hidden')) {
+        if (jselect.is(':hidden') && !wrap.hasClass("disabled")) {
           jselect.show();
           toggle();
           setTimeout(function() { jselect.focus(); }); /* avoid trampling confusion with triggered blur */
         } else {
-          confirm(true);
+          confirm(!wrap.hasClass("disabled"));
         }
       })
+      .bind("disable", function(e) { wrap.addClass("disabled"); confirm(true); })
+      .bind("enable", function(e) { wrap.removeClass("disabled"); })
       .appendTo(anchor);
     wrap
       .mousedown(function(e) { jselect.click(); })
       .keydown(function(e) { switch (e.which) { case 13: case 32: case 37: case 38: case 39: case 40: e.preventDefault(); jselect.click(); } }); /* preventDefault avoid pagescroll */
     select.size = Math.min(select.options.length, options.size || 10);
     confirm();
+    if (jselect.is(":disabled")) { jselect.trigger("disable"); }
   });
 }
